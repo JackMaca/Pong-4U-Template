@@ -61,6 +61,9 @@ namespace Pong
         //brush for paint method
         SolidBrush drawBrush = new SolidBrush(Color.White);
 
+        //font for countdown
+        Font drawFont = new Font("Arial", 24, FontStyle.Regular);
+
         #endregion
 
         public Form1()
@@ -142,20 +145,25 @@ namespace Pong
             newGameOk = true;
             SetParameters();
 
-            // TODO create code to make a graphics object, a brush, and a font to display the countdown
+            //create code to make a graphics object, a brush, and a font to display the countdown
+            Graphics formGraphics = this.CreateGraphics();
 
             startLabel.Visible = false;
             Refresh();
             
             //countdown to start of game
-            for (; ; ) // TODO create conditions for a for loop that counts down from 3 
+            for (int i = 3; i >= 1; i--) // TODO create conditions for a for loop that counts down from 3 
             {
-                // --- create code using DrawString to display the countdown in the appropriate area.  
+                // --- code using DrawString to display the countdown in the appropriate area.
+                formGraphics.DrawString("\n" + i, drawFont, drawBrush, this.Width/2 - 8, this.Height/2);
                 // --- sleep for 1 second
-                // --- refresh the screen
+                Thread.Sleep(1000);
+                // --- refresh the screen 
+                Refresh();
             }
-            
-            // TODO start the gameUpdateLoop timer
+
+            // start the gameUpdateLoop timer
+            gameUpdateLoop.Start();
             newGameOk = false;
         }
 
@@ -176,6 +184,8 @@ namespace Pong
                 player2Label.Text = "Player 2:  " + player2Score;
 
                 paddle1Y = paddle2Y = this.Height / 2 - PADDLE_LENGTH / 2;
+                ballX = this.Width / 2;
+                ballY = this.Height / 2;
 
             }
 
@@ -292,11 +302,12 @@ namespace Pong
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            // TODO draw paddles using FillRectangle
+            // draw paddles using FillRectangle
+            e.Graphics.FillRectangle(drawBrush, PADDLE_EDGE, paddle1Y, PADDLE_WIDTH, PADDLE_LENGTH);
+            e.Graphics.FillRectangle(drawBrush, this.Width - PADDLE_WIDTH - PADDLE_EDGE, paddle2Y, PADDLE_WIDTH, PADDLE_LENGTH);
 
-
-            // TODO draw ball using FillRectangle
-
+            // draw ball using FillRectangle
+            e.Graphics.FillRectangle(drawBrush, ballX, ballY, BALL_SIZE, BALL_SIZE);
         }
 
     }
