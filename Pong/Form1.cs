@@ -42,11 +42,11 @@ namespace Pong
         const int PADDLE_LENGTH = 40;
         const int PADDLE_WIDTH = 10;
         const int PADDLE_EDGE = 20;  // buffer distance between screen edge and paddle
-        const int PADDLE_SPEED = 4;
+        int PADDLE_SPEED = 4;
 
         //constants used to set size and speed of ball 
         const int BALL_SIZE = 10;
-        const int BALL_SPEED = 4;
+        int BALL_SPEED = 4;
 
         //player scores
         int player1Score = 0;
@@ -56,10 +56,11 @@ namespace Pong
         Boolean aKeyDown, zKeyDown, jKeyDown, mKeyDown;
 
         //game winning score
-        int gameWinScore = 2;
+        int gameWinScore = 3;
 
         //brush for paint method
         SolidBrush drawBrush = new SolidBrush(Color.White);
+        SolidBrush ballBrush = new SolidBrush(Color.White);
 
         //font for countdown
         Font drawFont = new Font("Arial", 24, FontStyle.Regular);
@@ -155,7 +156,7 @@ namespace Pong
             for (int i = 3; i >= 1; i--)
             {
                 // --- code using DrawString to display the countdown in the appropriate area.
-                formGraphics.DrawString("\n" + i, drawFont, drawBrush, this.Width/2 - 8, this.Height/2);
+                formGraphics.DrawString("\n" + i, drawFont, drawBrush, this.Width/2 - 14, this.Height/2);
                 // --- sleep for 1 second
                 Thread.Sleep(1000);
                 // --- refresh the screen 
@@ -275,12 +276,22 @@ namespace Pong
             {
                 ballMoveRight = true;
                 player.Play();
+                //colours
+                this.BackColor = Color.Red;
+                ballBrush.Color = Color.Blue;
+                BALL_SPEED++;
+                PADDLE_SPEED++;
             }
             //collide with p2 and play sound
             else if (ballY > paddle2Y && ballY < paddle2Y + PADDLE_LENGTH && ballX + BALL_SIZE > this.Width - PADDLE_EDGE - PADDLE_WIDTH / 2) // right paddle collision
             {
                 ballMoveRight = false;
                 player.Play();
+                //colours
+                this.BackColor = Color.Blue;
+                ballBrush.Color = Color.Red;
+                BALL_SPEED++;
+                PADDLE_SPEED++;
             }
 
             #endregion
@@ -292,6 +303,11 @@ namespace Pong
             //ball hits left wall
             if (ballX < 0)
             {
+                //change direction towards other player
+                ballMoveRight = true;
+                // reset speeds
+                BALL_SPEED = 4;
+                PADDLE_SPEED = 4;
                 // --- play score sound
                 player.Play();
                 // --- update player 2 score
@@ -319,6 +335,11 @@ namespace Pong
             //ball hits right wall
             if (ballX > this.Width - BALL_SIZE)
             {
+                //change direction towards other player
+                ballMoveRight = false;
+                // reset speeds
+                BALL_SPEED = 4;
+                PADDLE_SPEED = 4;
                 // --- play score sound
                 player.Play();
                 // --- update player 1 score
@@ -354,6 +375,9 @@ namespace Pong
         /// <param name="winner">The player name to be shown as the winner</param>
         private void GameOver(string winner)
         {
+            //reset color
+            ballBrush.Color = Color.White;
+            this.BackColor = Color.Black;
             newGameOk = true;
             // --- stop the gameUpdateLoop
             gameUpdateLoop.Stop();
@@ -380,7 +404,7 @@ namespace Pong
             e.Graphics.FillRectangle(drawBrush, this.Width - PADDLE_WIDTH - PADDLE_EDGE, paddle2Y, PADDLE_WIDTH, PADDLE_LENGTH);
 
             // draw ball using FillRectangle
-            e.Graphics.FillRectangle(drawBrush, ballX, ballY, BALL_SIZE, BALL_SIZE);
+            e.Graphics.FillRectangle(ballBrush, ballX, ballY, BALL_SIZE, BALL_SIZE);
         }
 
     }
